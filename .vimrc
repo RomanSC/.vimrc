@@ -3,15 +3,14 @@
 " Vi compatibility
 if &compatible | set nocompatible | set filetype=off | endif
 
-" Color scheme
-" set background=dark
-" colorscheme solarized8_flat
+" TODO:
+" Figure out if set filetype=off and set filetype plugin on are compatible
+" set filetype plugin on
 
-" Not using a colorscheme and setting 256 colors in terminal
-" for now
-
+" TODO:
+" Fix using :term &shell
 " In case of non-POSIX shell (like fish)
-set shell=/bin/sh
+set shell=/usr/bin/bash
 
 " Plugins
 call plug#begin('~/.vim/plugged')
@@ -19,21 +18,43 @@ call plug#begin('~/.vim/plugged')
     Plug 'tpope/vim-git'
     Plug 'tpope/vim-commentary'
     Plug 'tpope/vim-repeat'
-    Plug 'tpope/vim-surround'
+    " Plug 'tpope/vim-surround'
 
     " NerdTree for folder view
     Plug 'scrooloose/nerdtree'
     Plug 'Xuyuanp/nerdtree-git-plugin'
 
+    " Neat, indent guides
+    Plug 'nathanaelkane/vim-indent-guides'
+
+    " TODO
+    " Lint
+    Plug 'w0rp/ale'
+
+    " Autoclose
+    Plug 'raimondi/delimitmate'
+
+    " TODO:
+    " For some reason escape doesn't return to normal mode
+    " Multlple cursors
+    Plug 'terryma/vim-multiple-cursors'
+
+    " Backspace/Del/Enter in normal mode to save keystrokes
+    Plug 'dahu/insertlessly'
+
     " Favourite color schemes
-    " Plug 'altervim-colors-solarized'
-    Plug 'lifepillar/vim-solarized8'
-    " Plug 'dracula/vim'
     " Plug 'tomasr/molokai'
+    Plug 'roosta/srcery'
+    " Plug 'nightsense/vimspectr'
+    " Plug 'dracula/vim'
     " Plug 'nightsense/simplify/simplify'
-    
-    " No respect for legacy
-    Plug 'svermeulen/vim-easyclip' 
+    " Plug 'altervim-colors-solarized'
+    " Plug 'lifepillar/vim-solarized8'
+
+    " No respect for the buffers
+    " Plug 'svermeulen/vim-easyclip'
+
+    " Error checking
 
     " Code completion
     Plug 'Valloric/YouCompleteMe'
@@ -45,7 +66,7 @@ call plug#begin('~/.vim/plugged')
         " C++
 
         " Rust
-        
+
         " Go
 
         " Python
@@ -53,13 +74,24 @@ call plug#begin('~/.vim/plugged')
         " Ruby
 
         " Bash
-        
+
     " Markup
+
+    " LaTeX
+
+    " Just so everyone knows I use vim to write school papers
+
 
 call plug#end()
 
-" Command for quickly updating with vim-plug
-command! PU PlugClean | PlugInstall | PlugUpgrade
+" Command(s) for quickly updating with vim-plug
+command! PC PlugClean
+command! PI PlugInstall
+command! PU PlugUpgrade
+" Just :w | so % | PA
+" ???
+" profet.
+command! PA PlugClean | PlugInstall | PlugUpgrade
 
 " Tweaks
 
@@ -73,7 +105,7 @@ command! PU PlugClean | PlugInstall | PlugUpgrade
         " 4 tabs not spaces
         set tabstop=4 shiftwidth=4 softtabstop=4 expandtab smarttab
         set textwidth=80
-        set fixeol
+        " set fixeol
 
         " Remove whitespace on :w but only for specific files for safety
         " vim.wikia.com/wiki/Remove_unwanted_spaces
@@ -82,106 +114,123 @@ command! PU PlugClean | PlugInstall | PlugUpgrade
         " Also set to utf-8
         if &encoding !=? 'utf-8' | let &encoding = 'utf-8' | endif
 
-    " Show tabs and trailing whitespace
-    " set list listchars=tab:,trail:
+    " Static window height and width
+    set winminheight=0
+    set winwidth=80
+    set winminwidth=60
 
     " Search
     set showmatch
     set hlsearch
     set incsearch
-    set ignorecase
+    " Don't need this in vim, use ? and / appropriately
+    " set ignorecase
 
     " Clipboard
-    set clipboard=unnamed
     set clipboard+=unnamedplus
+    set guioptions+=aA
+    vmap "+y :!xclip -f -selection clip-board
+    map "+p :r!xclip -o -selection clip-board
 
     " Don't move cursor when exiting insert mode
     inoremap <silent> <Esc> <Esc>`^
 
-    " Leader key
-    let mapleader = ","
-    let g:mapleader = ","
-
-    " Coherent deleting, i.e. x and dd is not but delete ,x ,d equals cut
-    nnoremap x "_x
-    nnoremap d "_d
-    nnoremap D "_D
-    vnoremap d "_d
-    xnoremap p pgvy
-
-    nnoremap <leader>d ""d
-    nnoremap <leader>D ""D
-    vnoremap <leader>d ""d
-
-    " More natural splitting
-    set splitbelow
-    set splitright
-    set diffopt+=vertical
-
-    " \vt to :vsp and :term at once
-    nnoremap <leader>vt :vsp<cr>:term $SHELL<cr>
-
-    " \t to :sp and :term at once
-    nnoremap <leader>t :sp<cr>:term $SHELL<cr>
-
-    " Alt+hjkl and Alt+arrows window split navigation
-    nmap <silent> <A-k> :wincmd k<CR>
-    nmap <silent> <A-j> :wincmd j<CR>
-    nmap <silent> <A-h> :wincmd h<CR>
-    nmap <silent> <A-l> :wincmd l<CR>
-
-    nmap <silent> <A-Up> :wincmd k<CR>
-    nmap <silent> <A-Down> :wincmd j<CR>
-    nmap <silent> <A-Left> :wincmd h<CR>
-    nmap <silent> <A-Right> :wincmd l<CR>
-
-    " Ctrl+hjkl and Ctrl+arrows tab navigation
-    map <C-t><k> :tabr<cr>
-    map <C-t><j> :tabl<cr>
-    map <C-t><h> :tabp<cr>
-    map <C-t><l> :tabn<cr>
-
-    map <C-t><up> :tabr<cr>
-    map <C-t><down> :tabl<cr>
-    map <C-t><left> :tabp<cr>
-    map <C-t><right> :tabn<cr>
-
-    " Resizing with the same keybindings
-    if bufwinnr(1)
-        map <A-K> <C-W>+
-        map <A-J> <C-W>-
-        map <A-H> <c-w><
-        map <A-L> <c-w>>
-    endif
-
-    " Treat long lines as new lines for j and k
-    map j gj
-    map k gk
+    " Keep column position with cursor movement
+    nnoremap j gj
+    nnoremap k gk
+    vnoremap j gj
+    vnoremap k gk
+    nnoremap <Down> gj
+    nnoremap <Up> gk
+    vnoremap <Down> gj
+    vnoremap <Up> gk
+    inoremap <Down> <C-o>gj
+    inoremap <Up> <C-o>gk
 
     " Custom pane/tabs setup
 
-    " Gvim
+    " GUI vim
     if has("gui_running")
         " Remove GUI elements
+        " echo "TEST"
         set guioptions-=m "remove menu bar
         set guioptions-=T "remove toolbar
         set guioptions-=r "remove right-hand scroll bar
         set guioptions-=L "remove left-hand scrollbar
-
         set termguicolors
+
     endif
 
     " Commands
-    " Edit vim rc with :erc
-    command! Vrc :e ~/.vimrc
-    
-    " Functions
-
         " Edit vim rc with :erc
-        " function! erc
+        command! Vrc :e ~/.vimrc
+        command! IDE :NERDTree | :sp<CR> | :term bash<CR>
 
     " Required by or for plugins
+
         " NERDTree autoload on empty file
         autocmd StdinReadPre * let s:std_in=1
         autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
 
+    "  nmap gm m
+    set clipboard+=unnamedplus
+
+    " Leader key
+    " let mapleader = ","
+    " let g:mapleader = ","
+
+    " Coherent deleting, i.e. x and dd is not but delete ,x ,d equals cut
+    " nmap x "_x
+    " nmap d "_d
+    " nmap D "_D
+    " vnoremap d "_d
+    " xnoremap p pgvy
+
+    " nmap <leader>d ""d
+    " nmap <leader>D ""D
+    " vnoremap <leader>d ""d
+    " vnoremap <leader>dd ""dd
+
+    " More natural splitting
+    set splitbelow
+    set splitright
+
+    " Split panes horizontally
+    " <leader>vt to :vsp and :term $SHELL at once
+    nmap <leader>vt :vsp<CR>:term term zsh<CR>
+
+    " Split panes vertically
+    " <leader>t to :sp and :term $SHELL at once
+    nmap <leader>t :sp<CR>:term term zsh<CR>
+
+    " Alt + hjkl/ and Shift+Alt+hjkl/arrows pane navigation
+    " Also when entering a pane, go the the last
+    " cursor location in that pane
+    map <silent>  h <C-W>h<C-W>_
+    map <silent> j <C-W>j<C-W>_
+    map <silent> k <C-W>k<C-W>_
+    map <silent> l <C-W>l<C-W>_
+
+    map <silent>  left <C-W>h<C-W>_
+    map <silent> down <C-W>j<C-W>_
+    map <silent> up <C-W>k<C-W>_
+    map <silent> right <C-W>l<C-W>_
+
+    " TODO: BORKED
+    " Resize panes
+    " map <silent> ^[H <C-W>< :echo "h"
+    " map <silent> ^[J <C-W>- :echo "j"
+    " map <silent> ^[K <C-W>+ :echo "k"
+    " map <silent> ^[L <C-W>> :echo "l"
+
+    " Allow wincmds in insert mode without deleting
+    " any characters
+    " imap <A-w>
+
+    " keypress timeout
+    set timeoutlen=1
+
+" Color scheme
+" set background=dark
+set termguicolors " Colorscheme last for regex ;)
+colorscheme rupza
